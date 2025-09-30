@@ -15,7 +15,6 @@ function useDebouncedValue(value, delayMs) {
 }
 
 export default function CustomersTable() {
-  // Generate data once
   const [allData] = useState(() => generateCustomers(TOTAL_RECORDS))
   const [visibleData, setVisibleData] = useState(() => allData.slice(0, PAGE_SIZE * 2))
   const [loadedRows, setLoadedRows] = useState(visibleData.length)
@@ -83,12 +82,10 @@ export default function CustomersTable() {
     return () => el.removeEventListener('scroll', onScroll)
   }, [allData.length])
 
-  // Whenever loadedRows increases, extend visibleData from the appropriate base set (filtered or not)
   useEffect(() => {
     if (!debouncedQuery) {
       setVisibleData(allData.slice(0, loadedRows))
     } else {
-      // When searching, we extend on already filtered visible list by re-running filter quickly on a subset
       const q = debouncedQuery.toLowerCase().trim()
       chunkedFilter(allData, (item) => item.searchIndex.includes(q), { chunkSize: 50000 }).then((matches) => {
         setVisibleData(matches.slice(0, loadedRows))
@@ -192,5 +189,6 @@ export default function CustomersTable() {
     </div>
   )
 }
+
 
 

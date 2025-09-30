@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Page Not Found</title>
+    <meta http-equiv="refresh" content="0;url=../index.html" />
+    <script>
+      // Redirect all unknown routes to index for SPA routing on GitHub Pages
+      const redirectTo = (function () {
+        const l = window.location;
+        const path = l.pathname.replace(/^(.*\/quicksell)(\/)?/, '$1');
+        const hash = l.hash || '';
+        const query = l.search || '';
+        return '../index.html' + query + hash;
+      })();
+      window.location.replace(redirectTo);
+    </script>
+  </head>
+  <body>
+    <h1>Redirecting…</h1>
+    <a href="../index.html">Click here if you are not redirected.</a>
+  </body>
+  </html>
+
+

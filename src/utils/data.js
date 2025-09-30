@@ -1,17 +1,10 @@
-// Utilities for generating and working with a large in-memory dataset of customers
 
-/**
- * Returns a deterministic pseudo-random number generator seeded by an integer.
- * This avoids heavy deps and keeps the dataset stable across refreshes.
- */
 export function createPrng(seed) {
   let state = seed >>> 0;
   return function next() {
-    // xorshift32
     state ^= state << 13;
     state ^= state >>> 17;
     state ^= state << 5;
-    // Convert to [0,1)
     return (state >>> 0) / 4294967296;
   };
 }
@@ -38,10 +31,6 @@ const AVATARS = [
   '/public/vite.svg',
 ];
 
-/**
- * Generates an array of customer objects of the specified size. Designed to be fast and memory-friendly.
- * Each record also carries a `searchIndex` which is a lower-cased composite string for quick includes() checks.
- */
 export function generateCustomers(count = 1_000_000, seed = 12345) {
   const rand = createPrng(seed);
   const customers = new Array(count);
@@ -71,7 +60,6 @@ export function generateCustomers(count = 1_000_000, seed = 12345) {
       addedBy,
       avatar,
     };
-    // Precompute a search index for quick case-insensitive contains checks
     record.searchIndex = `${fullName}|${email}|${phone}`.toLowerCase();
     customers[i] = record;
   }
@@ -79,14 +67,10 @@ export function generateCustomers(count = 1_000_000, seed = 12345) {
   return customers;
 }
 
-/**
- * Chunked filter over a large array to avoid long main-thread blocks.
- * Processes the input array in time-sliced chunks and resolves with matches.
- */
 export function chunkedFilter(sourceArray, predicate, options) {
   const {
     chunkSize = 50000,
-    frameBudgetMs = 12, // try to keep well under a frame (~16ms)
+    frameBudgetMs = 12,
   } = options || {};
 
   return new Promise((resolve) => {
@@ -119,5 +103,6 @@ export function formatDateTime(isoString) {
     hour: '2-digit', minute: '2-digit', hour12: true,
   }).format(d);
 }
+
 
 
