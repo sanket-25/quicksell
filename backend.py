@@ -7,7 +7,6 @@ import time
 from datetime import datetime, timedelta
 import threading
 
-# Try to import Faker; if not available, we'll use a fallback generator
 try:
     from faker import Faker
     HAS_FAKER = True
@@ -19,17 +18,15 @@ except Exception:
 app = Flask(__name__)
 CORS(app)
 
-TOTAL_USERS = 1_000_000  # one million
+TOTAL_USERS = 1_000_000 
 _USERS = None
 _USERS_LOCK = threading.Lock()
 _GENERATED = False
 
 def random_phone():
-    # Indian-like phone numbers or general format
     return "+1" + "".join(random.choices(string.digits, k=10))
 
 def random_email(name, uid):
-    # deterministic-ish small email
     safe = "".join(c for c in name.lower() if c.isalnum())[:12] or "user"
     domain = random.choice(["example.com", "mail.com", "demo.net", "sample.org"])
     return f"{safe}.{uid}@{domain}"
@@ -37,9 +34,8 @@ def random_email(name, uid):
 def random_name(uid):
     if HAS_FAKER:
         return fake.name()
-    # fallback: combine random first and last
     first = random.choice([
-        "Alex","Sam","Taylor","Jordan","Chris","Pat","Morgan","Jamie","Casey","Riley",
+        "Sanket","Sam","Taylor","Jordan","Chris","Pat","Morgan","Jamie","Casey","Riley",
         "Avery","Quinn","Drew","Hayden","Cameron","Devin","Skyler","Parker","Rowan","Kendall"
     ])
     last = random.choice([
@@ -49,7 +45,6 @@ def random_name(uid):
     return f"{first} {last}"
 
 def random_last_message_at():
-    # return ISO timestamp within last 365 days
     dt = datetime.utcnow() - timedelta(seconds=random.randint(0, 365*24*3600))
     return dt.isoformat() + "Z"
 
