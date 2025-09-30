@@ -1,3 +1,4 @@
+// random generation of data
 export function createPrng(seed) {
   let state = seed >>> 0;
 
@@ -29,13 +30,6 @@ const ADDED_BY = [
   "Pooja Patel", "Aman Gupta",
 ];
 
-const AVATARS = [
-  "/public/test_user-3 3.svg",
-  "/public/test_Search-3.svg",
-  "/public/test_Filter.svg",
-  "/public/vite.svg",
-];
-
 export function generateCustomers(total = 1_000_000, seed = 12345) {
   const rand = createPrng(seed);
   const customers = [];
@@ -46,12 +40,13 @@ export function generateCustomers(total = 1_000_000, seed = 12345) {
     const last = SURNAMES[Math.floor(rand() * SURNAMES.length)];
     const fullName = `${first} ${last}`;
 
-    const score = Math.floor(rand() * 100) + 1;
-    const phoneNumber = "+91" + (1000000000 + Math.floor(rand() * 9999999999));
+    const score = Math.floor(rand() * 100) + 1; // Score 1-100
+    const phoneNumber = "+91" + (1000000000 + Math.floor(rand() * 8999999999)); 
 
     const emailUser = `${first}.${last}${Math.floor(rand() * 1000)}`.toLowerCase();
     const email = `${emailUser}@gmail.com`;
 
+    // Generate random timestamp within the last year
     const daysAgo = Math.floor(rand() * 365);
     const minutesAgo = Math.floor(rand() * (24 * 60));
     const lastMessageAt = new Date(
@@ -59,7 +54,6 @@ export function generateCustomers(total = 1_000_000, seed = 12345) {
     ).toISOString();
 
     const addedBy = ADDED_BY[Math.floor(rand() * ADDED_BY.length)];
-    const avatar = AVATARS[Math.floor(rand() * AVATARS.length)];
 
     customers.push({
       id: i + 1,
@@ -69,8 +63,7 @@ export function generateCustomers(total = 1_000_000, seed = 12345) {
       score,
       lastMessageAt,
       addedBy,
-      avatar,
-      searchIndex: `${fullName}|${email}|${phoneNumber}`.toLowerCase(),
+      searchIndex: `${fullName}|${email}|${phoneNumber}`.toLowerCase(), 
     });
   }
 
@@ -98,12 +91,12 @@ export function chunkedFilter(list, checkFn, opts) {
         count++;
 
         if (performance.now() - start > frameBudget) {
-          break; // give control back
+          break;
         }
       }
 
       if (index < list.length) {
-        setTimeout(step, 0);
+        setTimeout(step, 0); 
       } else {
         resolve(result);
       }

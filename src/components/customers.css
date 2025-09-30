@@ -2,235 +2,251 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    color: #1f2937;
-}
-
-.topbar {
+    color: #333;
+    background: #f9f9f9;
+  }
+  
+  .topbar {
     position: sticky;
     top: 0;
     z-index: 20;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 12px 16px;
-}
-
-.brand {
+    background: white;
+    border-bottom: 0.1vh solid lightgray;
+    padding: 1vh 1.5vw;
+  }
+  
+  .brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 700;
-}
-
-.brand img {
-    height: 20px;
-}
-
-/* Adjust content height calculation slightly for robustness */
-.content {
-    padding: 16px;
+    gap: 0.5vw;
+    font-weight: bold;
+  }
+  
+  .brand img {
+    height: 5vh;
+  }
+  
+  .content {
+    flex: 1;
+    min-height: 0;
+    padding: 1.5vh 1.5vw;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    /* Using flex-grow instead of a hard calc height is often cleaner */
-    flex-grow: 1; 
-    min-height: 0; /* Important for flex children with overflow */
-}
-
-.title-row {
+    gap: 1vh;
+  }
+  
+  .title-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.title {
-    font-size: 18px;
+  }
+  
+  .title {
+    font-size: 2vh;
     font-weight: 600;
-}
-
-.badge {
-    background: #e5f7ed;
-    color: #0f9d58;
-    border-radius: 999px;
-    padding: 2px 8px;
-    font-size: 12px;
-    margin-left: 6px;
-}
-
-.controls {
-    display: flex;
-    gap: 12px;
-}
-
-.search {
-    flex: 1;
+  }
+  
+  .badge {
+    background: #e8fbe8;
+    color: green;
+    border-radius: 50vw;
+    padding: 0.3vh 0.8vw;
+    font-size: 2vh;
+    margin-left: 0.5vw;
+  }
+  
+  .controls {
     display: flex;
     align-items: center;
-    gap: 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 8px 10px;
-    background: #fff;
-}
+    gap: 1vw;
+  }
+  
+  .search-wrapper {
+    flex: 0 0 30%;
+  }
+  
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+    border: 0.1vh solid lightgray;
+    border-radius: 0.1vh;
+    padding: 0.8vh 1vw;
+    background: white;
+  }
 
-.search input {
+  .search img{
+    width: 20px;
+    height: 20px;
+  }
+  
+  .search input {
     border: none;
     outline: none;
     width: 100%;
-    font-size: 14px;
-}
-
-.filters {
+    font-size: 1.7vh;
+  }
+  
+  .filters {
     position: relative;
-}
-
-.filter-btn {
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    border-radius: 8px;
-    padding: 8px 12px;
+  }
+  
+  
+  .filter-btn {
+    border: 0.1vh solid lightgray;
+    background: white;
+    border-radius: 0.3vw;
+    padding: 0.8vh 1vw;
     cursor: pointer;
-    transition: background 0.1s;
-}
-
-.filter-btn:hover {
-    background: #f9fafb;
-}
-
-/* Make filter menu interaction more explicit */
-.filters:hover .filter-menu {
+  }
+  
+  .filter-btn:hover {
+    background: #f2f2f2;
+  }
+  
+  .filters:hover .filter-menu {
     display: block;
-}
-
-.filter-menu {
+  }
+  
+  .filter-menu {
     display: none;
     position: absolute;
-    /* Adjust top to sit nicely below button */
-    top: calc(100% + 4px); 
-    right: 0; /* Align right for better usability */
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    width: 180px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    z-index: 30; /* Ensure it appears over the table */
-}
-
-.filter-menu>div {
-    padding: 10px 12px;
-    cursor: pointer; /* Change to pointer to indicate it's clickable */
-}
-
-.filter-menu>div:hover {
-    background: #f3f4f6;
-}
-
-.table-container {
+    top: calc(100% + 0.5vh);
+    right: 0;
+    width: 15vw;
+    background: white;
+    border: 0.1vh solid lightgray;
+    border-radius: 1vw;
+    box-shadow: 0 1vh 3vh rgba(0, 0, 0, 0.08);
+    z-index: 30;
+  }
+  
+  .filter-menu > div {
+    padding: 0.8vh 1vw;
+    cursor: pointer;
+  }
+  
+  .filter-menu > div:hover {
+    background: #f5f5f5;
+  }
+  
+  .table-container {
     flex: 1;
-    overflow-y: auto; /* Explicitly use y for vertical scroll */
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background: #fff;
-}
-
-.customers-table {
+    overflow-y: auto;
+    border: 0.1vh solid lightgray;
+    border-radius: 1vw;
+    background: white;
+  }
+  
+  .customers-table {
     width: 100%;
-    /* Use collapse for a slightly cleaner look without visible separation */
-    border-collapse: collapse; 
-    /* Remove border-spacing as it's not needed with collapse */
-}
-
-.customers-table thead th {
+    border-collapse: collapse;
+  }
+  
+  .customers-table thead th {
     position: sticky;
     top: 0;
-    background: #f9fafb;
+    background: #fafafa;
     z-index: 10;
     font-weight: 600;
     text-align: left;
-    padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.customers-table tbody td {
-    padding: 12px;
-    border-bottom: 1px solid #f3f4f6;
-    font-size: 14px;
-    color: #374151;
-}
-
-.row:hover {
-    background: #f9fafb;
-}
-
-.th-btn {
+    padding: 1vh;
+    border-bottom: 0.1vh solid lightgray;
+  }
+  
+  .customers-table tbody td {
+    padding: 1vh;
+    border-bottom: 0.1vh solid #eee;
+    font-size: 2vh;
+    color: #444;
+    white-space: nowrap;
+  }
+  
+  
+  .row:hover {
+    background: #fafafa;
+  }
+  
+  .th-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     background: transparent;
     border: none;
     cursor: pointer;
     font: inherit;
     color: inherit;
-    /* Make button full width of the header for larger click area */
-    width: 100%; 
+    width: 100%;
     text-align: left;
-    padding: 0;
-}
-
-.th-btn .sort-caret {
-    color: #9ca3af;
-    transition: color 0.1s;
-}
-
-.th-btn.active .sort-caret {
-    color: #111827;
-}
-
-.cell-customer {
+  }
+  
+  .th-btn .sort-caret {
+    color: gray;
+  }
+  
+  .th-btn.active .sort-caret {
+    color: black;
+  }
+  
+  .cell-customer {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.avatar {
-    width: 34px;
-    height: 34px;
+    gap: 1vw;
+  }
+  
+  .avatar {
+    width: 3vw;
+    height: 3vw;
     border-radius: 50%;
-    background: #e5e7eb;
+    /* background: lightgray; */
     object-fit: cover;
-}
-
-.customer-texts {
+  }
+  
+  .customer-texts {
     display: flex;
     flex-direction: column;
-}
-
-.name {
+  }
+  
+  .name {
     font-weight: 600;
-}
-
-.phone {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.added-by {
-    white-space: nowrap;
+  }
+  
+  .phone {
+    font-size: 1.5vh;
+    color: gray;
+  }
+  
+  .added-by {
     display: flex;
     align-items: center;
-    gap: 8px;
-}
-
-.added-by .avatar {
-    width: 24px;
-    height: 24px;
-}
-
-/* Added styles for the infinite scroll indicator */
-.loading-sentinel {
-    padding: 20px;
+    gap: 0.5vw;
+    white-space: nowrap;
+  }
+  
+  
+  .added-by .avatar {
+    width: 2vw;
+    height: 2vw;
+  }
+  
+  .loading-sentinel {
+    padding: 2vh 0;
     text-align: center;
-    font-size: 14px;
-    color: #6b7280;
+    font-size: 1.5vh;
+    color: gray;
     background: #fcfcfc;
-    border-top: 1px solid #e5e7eb;
-}
+    border-top: 0.1vh solid lightgray;
+  }
+
+
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5vw;
+  }
+  .filter-icon {
+    width: 1.5vw;
+    height: 1.5vw;
+  }
+  
+  

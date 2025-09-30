@@ -1,11 +1,13 @@
+// all imports here
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { chunkedFilter, formatDateTime, generateCustomers } from '../data/data.js'
 import './customers.css'
 
+
+// pagination of 30 items at a time
 const PAGE_SIZE = 30
 const TOTAL_RECORDS = 1_000_000
 
-// Custom hook to debounce a value
 function useDebouncedValue(value, delayMs) {
   const [debounced, setDebounced] = useState(value)
   useEffect(() => {
@@ -26,9 +28,10 @@ export default function CustomersTable() {
   const [sortState, setSortState] = useState({ key: 'name', dir: 'asc' })
 
   const containerRef = useRef(null)
-  const sentinelRef = useRef(null) // Used for Intersection Observer
+  const sentinelRef = useRef(null)
 
-  // --- Search and Data Visibility Management ---
+
+  // update pagination on scroll
   useEffect(() => {
     let cancelled = false
 
@@ -37,28 +40,28 @@ export default function CustomersTable() {
       let dataToDisplay
 
       if (!q) {
-        // No query: show initial data up to loadedRows
         dataToDisplay = allData
       } else {
-        // Query exists: perform chunked filtering
-        const matches = await chunkedFilter(allData, (item) => item.searchIndex.includes(q), { chunkSize: 50000 })
+        const matches = await chunkedFilter(
+          allData,
+          (item) => item.searchIndex.includes(q),
+          { chunkSize: 50000 }
+        )
         if (cancelled) return
         dataToDisplay = matches
       }
 
-      // Update the visible data, respecting the current loadedRows count
-      setVisibleData(dataToDisplay.slice(0, loadedRows))
+      setLoadedRows(PAGE_SIZE * 2)
+      setVisibleData(dataToDisplay)
     }
 
     updateVisibleData()
-
     return () => { cancelled = true }
-  }, [debouncedQuery, allData, loadedRows])
+  }, [debouncedQuery, allData])
 
 
-  // --- Sorting Logic ---
+  // sorting the data (ascending, descending)
   const sortedData = useMemo(() => {
-    // Only sort the currently visible data array
     const arr = visibleData.slice()
     const { key, dir } = sortState
     const factor = dir === 'asc' ? 1 : -1
@@ -67,13 +70,11 @@ export default function CustomersTable() {
       let valA = a[key]
       let valB = b[key]
 
-      // Handle date comparison for 'lastMessageAt'
       if (key === 'lastMessageAt') {
-        valA = new Date(valA).getTime();
+        valA = new Date(valA).getTime()
         valB = new Date(valB).getTime()
       }
 
-      // Ensure case-insensitive string comparison
       if (typeof valA === 'string') valA = valA.toLowerCase()
       if (typeof valB === 'string') valB = valB.toLowerCase()
 
@@ -84,38 +85,35 @@ export default function CustomersTable() {
     return arr
   }, [visibleData, sortState])
 
-
-  // --- Infinite Scroll with Intersection Observer ---
   useEffect(() => {
     const sentinel = sentinelRef.current
     if (!sentinel) return
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && loadedRows < TOTAL_RECORDS && loadedRows < visibleData.length) {
-        // The sentinel is visible and there are more rows to load in the current filtered/full dataset
-        setLoadedRows((prev) => Math.min(prev + PAGE_SIZE, TOTAL_RECORDS))
+      const isIntersecting = entries[0]?.isIntersecting
+      const hasMoreData = loadedRows < visibleData.length
+
+      if (isIntersecting && hasMoreData) {
+        setLoadedRows((prev) => Math.min(prev + PAGE_SIZE, visibleData.length))
       }
     }, {
-      root: containerRef.current, // Observe relative to the scrollable table container
-      rootMargin: '0px 0px 200px 0px', // Start observing 200px before the sentinel is visible
+      root: containerRef.current,
+      // rootMargin: '0px 0px 200px 0px',
       threshold: 0,
     })
 
     observer.observe(sentinel)
-
     return () => {
       if (sentinel) observer.unobserve(sentinel)
     }
   }, [loadedRows, visibleData.length])
 
-
-  // --- Helper Functions ---
   function toggleSort(key) {
     setSortState((prev) => {
       if (prev.key === key) {
         return { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
       }
-      return { key, dir: 'asc' } // Default to ascending when changing columns
+      return { key, dir: 'asc' }
     })
   }
 
@@ -123,15 +121,19 @@ export default function CustomersTable() {
     const active = sortState.key === columnKey
     return (
       <th style={{ width }}>
-        <button className={`th-btn ${active ? 'active' : ''}`} onClick={() => toggleSort(columnKey)}>
+        <button
+          className={`th-btn ${active ? 'active' : ''}`}
+          onClick={() => toggleSort(columnKey)}
+        >
           <span>{children}</span>
-          <span className="sort-caret">{active ? (sortState.dir === 'asc' ? '▲' : '▼') : '↕'}</span>
+          <span className="sort-caret">
+            {active ? (sortState.dir === 'asc' ? '▲' : '▼') : '↕'}
+          </span>
         </button>
       </th>
     )
   }
 
-  // Determine the number of rows to actually render
   const rowsToRender = sortedData.slice(0, loadedRows)
   const dataCount = debouncedQuery ? visibleData.length : allData.length
 
@@ -139,35 +141,42 @@ export default function CustomersTable() {
     <div className="page">
       <header className="topbar">
         <div className="brand">
-          <img src="/public/Doubletick Logo.png" alt="DoubleTick" />
-          <span>DoubleTick</span>
+          <img src="/public/logo.png" alt="DoubleTick" />
         </div>
       </header>
 
       <div className="content">
         <div className="title-row">
-          <div className="title">All Customers <span className="badge">{dataCount.toLocaleString()}</span></div>
+          <div className="title">
+            All Customers <span className="badge">{dataCount.toLocaleString()}</span>
+          </div>
         </div>
 
         <div className="controls">
-          <div className="search">
-            <span className="icon">🔍</span>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search Customers"
-            />
+          <div className="search-wrapper">
+            <div className="search">
+              <img className="avatar" src="/public/search.svg" alt="avatar" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search Customers"
+              />
+            </div>
           </div>
           <div className="filters">
-            <button className="filter-btn">Add Filters ▾</button>
+            <button className="filter-btn">
+              <img src="/public/filter.svg" alt="filter" className="filter-icon" />
+              Add Filters
+            </button>
             <div className="filter-menu">
-              <div>Filter 1</div>
-              <div>Filter 2</div>
-              <div>Filter 3</div>
+              <div>Filter by Score</div>
+              <div>Filter by Added By</div>
+              <div>Filter by Last Message Date</div>
               <div>Filter 4</div>
             </div>
           </div>
         </div>
+
 
         <div className="table-container" ref={containerRef}>
           <table className="customers-table">
@@ -182,7 +191,6 @@ export default function CustomersTable() {
               </tr>
             </thead>
             <tbody>
-              {/* Render only the currently loaded and sorted rows */}
               {rowsToRender.map((c) => (
                 <tr key={c.id} className="row">
                   <td><input type="checkbox" /></td>
@@ -206,10 +214,16 @@ export default function CustomersTable() {
               ))}
             </tbody>
           </table>
-          {/* Sentinel for Intersection Observer to trigger next load */}
+
           {loadedRows < dataCount && (
             <div ref={sentinelRef} className="loading-sentinel">
               Loading more customers...
+            </div>
+          )}
+
+          {dataCount === 0 && (
+            <div className="loading-sentinel" style={{ border: 'none' }}>
+              No customers match your search query.
             </div>
           )}
         </div>
