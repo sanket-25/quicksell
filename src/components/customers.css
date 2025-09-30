@@ -1,0 +1,39 @@
+.page { display: flex; flex-direction: column; height: 100vh; color: #1f2937; }
+.topbar { position: sticky; top: 0; z-index: 20; background: #ffffff; border-bottom: 1px solid #e5e7eb; padding: 12px 16px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.brand img { height: 20px; }
+
+.content { padding: 16px; display: flex; flex-direction: column; gap: 12px; height: calc(100vh - 53px); }
+.title-row { display: flex; align-items: center; justify-content: space-between; }
+.title { font-size: 18px; font-weight: 600; }
+.badge { background: #e5f7ed; color: #0f9d58; border-radius: 999px; padding: 2px 8px; font-size: 12px; margin-left: 6px; }
+
+.controls { display: flex; gap: 12px; }
+.search { flex: 1; display: flex; align-items: center; gap: 8px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; background: #fff; }
+.search input { border: none; outline: none; width: 100%; font-size: 14px; }
+.filters { position: relative; }
+.filter-btn { border: 1px solid #e5e7eb; background: #fff; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+.filters:hover .filter-menu { display: block; }
+.filter-menu { display: none; position: absolute; top: 40px; left: 0; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; width: 180px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+.filter-menu > div { padding: 10px 12px; cursor: default; }
+.filter-menu > div:hover { background: #f3f4f6; }
+
+.table-container { flex: 1; overflow: auto; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; }
+.customers-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.customers-table thead th { position: sticky; top: 0; background: #f9fafb; z-index: 10; font-weight: 600; text-align: left; padding: 12px; border-bottom: 1px solid #e5e7eb; }
+.customers-table tbody td { padding: 12px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #374151; }
+.row:hover { background: #f9fafb; }
+
+.th-btn { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: none; cursor: pointer; font: inherit; color: inherit; }
+.th-btn .sort-caret { color: #9ca3af; }
+.th-btn.active .sort-caret { color: #111827; }
+
+.cell-customer { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: #e5e7eb; }
+.customer-texts { display: flex; flex-direction: column; }
+.name { font-weight: 600; }
+.phone { font-size: 12px; color: #6b7280; }
+.added-by { white-space: nowrap; }
+.user-icon { color: #9ca3af; margin-right: 6px; }
+
+
