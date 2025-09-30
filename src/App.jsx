@@ -1,16 +1,9 @@
 import { Routes, Route, Link } from 'react-router-dom'
+import Home from './pages/Home'
+import About from './pages/About'
+import Contact from './pages/Contact'
 
-function Home() {
-  return <h1>Home Page</h1>
-}
 
-function About() {
-  return <h1>About Page</h1>
-}
-
-function Contact() {
-  return <h1>Contact Page</h1>
-}
 
 export default function App() {
   return (
