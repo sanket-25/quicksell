@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { chunkedFilter, formatDateTime, generateCustomers } from '../utils/data.js'
+import { chunkedFilter, formatDateTime, generateCustomers } from '../data/data.js'
 import './customers.css'
 
 const PAGE_SIZE = 30
@@ -166,7 +166,7 @@ export default function CustomersTable() {
                   <td><input type="checkbox" /></td>
                   <td>
                     <div className="cell-customer">
-                      <img className="avatar" src={c.avatar} alt="avatar" />
+                      <img className="avatar" src="/public/profile.webp" alt="avatar" />
                       <div className="customer-texts">
                         <div className="name">{c.name}</div>
                         <div className="phone">{c.phone}</div>
@@ -177,7 +177,8 @@ export default function CustomersTable() {
                   <td>{c.email}</td>
                   <td>{formatDateTime(c.lastMessageAt)}</td>
                   <td className="added-by">
-                    <span className="user-icon">👤</span> {c.addedBy}
+                  <img className="avatar" src="/public/addedBy.svg" alt="avatar" />
+                  {c.addedBy}
                   </td>
                 </tr>
               ))}
@@ -189,6 +190,7 @@ export default function CustomersTable() {
     </div>
   )
 }
+
 
 
 

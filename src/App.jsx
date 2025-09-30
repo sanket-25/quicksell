@@ -1,7 +1,5 @@
 import CustomersTable from './components/CustomersTable.jsx'
 
-function App() {
+export default function App() {
   return <CustomersTable />
 }
-
-export default App
