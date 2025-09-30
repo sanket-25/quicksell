@@ -1,12 +1,10 @@
-// Simple PRNG (xorshift32) I found from docs/examples
 export function createPrng(seed) {
-  let state = seed >>> 0; // force to unsigned
+  let state = seed >>> 0;
 
   return function next() {
     state ^= state << 13;
     state ^= state >>> 17;
     state ^= state << 5;
-    // divide by 2^32 to get 0..1
     return (state >>> 0) / 4294967296;
   };
 }

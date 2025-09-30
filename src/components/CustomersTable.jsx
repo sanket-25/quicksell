@@ -5,6 +5,7 @@ import './customers.css'
 const PAGE_SIZE = 30
 const TOTAL_RECORDS = 1_000_000
 
+// Custom hook to debounce a value
 function useDebouncedValue(value, delayMs) {
   const [debounced, setDebounced] = useState(value)
   useEffect(() => {
@@ -17,7 +18,7 @@ function useDebouncedValue(value, delayMs) {
 export default function CustomersTable() {
   const [allData] = useState(() => generateCustomers(TOTAL_RECORDS))
   const [visibleData, setVisibleData] = useState(() => allData.slice(0, PAGE_SIZE * 2))
-  const [loadedRows, setLoadedRows] = useState(visibleData.length)
+  const [loadedRows, setLoadedRows] = useState(PAGE_SIZE * 2)
 
   const [query, setQuery] = useState('')
   const debouncedQuery = useDebouncedValue(query, 250)
@@ -25,80 +26,96 @@ export default function CustomersTable() {
   const [sortState, setSortState] = useState({ key: 'name', dir: 'asc' })
 
   const containerRef = useRef(null)
-  const sentinelRef = useRef(null)
+  const sentinelRef = useRef(null) // Used for Intersection Observer
 
-  // Apply search
+  // --- Search and Data Visibility Management ---
   useEffect(() => {
     let cancelled = false
-    async function run() {
-      if (!debouncedQuery) {
-        const base = allData.slice(0, Math.max(loadedRows, PAGE_SIZE * 2))
-        setVisibleData(base)
-        return
-      }
+
+    async function updateVisibleData() {
       const q = debouncedQuery.toLowerCase().trim()
-      const matches = await chunkedFilter(allData, (item) => item.searchIndex.includes(q))
-      if (cancelled) return
-      setVisibleData(matches.slice(0, Math.max(loadedRows, PAGE_SIZE * 2)))
+      let dataToDisplay
+
+      if (!q) {
+        // No query: show initial data up to loadedRows
+        dataToDisplay = allData
+      } else {
+        // Query exists: perform chunked filtering
+        const matches = await chunkedFilter(allData, (item) => item.searchIndex.includes(q), { chunkSize: 50000 })
+        if (cancelled) return
+        dataToDisplay = matches
+      }
+
+      // Update the visible data, respecting the current loadedRows count
+      setVisibleData(dataToDisplay.slice(0, loadedRows))
     }
-    run()
+
+    updateVisibleData()
+
     return () => { cancelled = true }
   }, [debouncedQuery, allData, loadedRows])
 
-  // Apply sort when sort changes or data set changes
+
+  // --- Sorting Logic ---
   const sortedData = useMemo(() => {
+    // Only sort the currently visible data array
     const arr = visibleData.slice()
     const { key, dir } = sortState
     const factor = dir === 'asc' ? 1 : -1
+
     arr.sort((a, b) => {
-      let aa = a[key]
-      let bb = b[key]
+      let valA = a[key]
+      let valB = b[key]
+
+      // Handle date comparison for 'lastMessageAt'
       if (key === 'lastMessageAt') {
-        aa = new Date(aa).getTime(); bb = new Date(bb).getTime()
+        valA = new Date(valA).getTime();
+        valB = new Date(valB).getTime()
       }
-      if (typeof aa === 'string') aa = aa.toLowerCase()
-      if (typeof bb === 'string') bb = bb.toLowerCase()
-      if (aa < bb) return -1 * factor
-      if (aa > bb) return 1 * factor
+
+      // Ensure case-insensitive string comparison
+      if (typeof valA === 'string') valA = valA.toLowerCase()
+      if (typeof valB === 'string') valB = valB.toLowerCase()
+
+      if (valA < valB) return -1 * factor
+      if (valA > valB) return 1 * factor
       return 0
     })
     return arr
   }, [visibleData, sortState])
 
-  // Infinite scroll loader
+
+  // --- Infinite Scroll with Intersection Observer ---
   useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    function onScroll() {
-      const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 200
-      if (nearBottom) {
-        setLoadedRows((prev) => {
-          const next = Math.min(prev + PAGE_SIZE, allData.length)
-          return next
-        })
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && loadedRows < TOTAL_RECORDS && loadedRows < visibleData.length) {
+        // The sentinel is visible and there are more rows to load in the current filtered/full dataset
+        setLoadedRows((prev) => Math.min(prev + PAGE_SIZE, TOTAL_RECORDS))
       }
-    }
-    el.addEventListener('scroll', onScroll)
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [allData.length])
+    }, {
+      root: containerRef.current, // Observe relative to the scrollable table container
+      rootMargin: '0px 0px 200px 0px', // Start observing 200px before the sentinel is visible
+      threshold: 0,
+    })
 
-  useEffect(() => {
-    if (!debouncedQuery) {
-      setVisibleData(allData.slice(0, loadedRows))
-    } else {
-      const q = debouncedQuery.toLowerCase().trim()
-      chunkedFilter(allData, (item) => item.searchIndex.includes(q), { chunkSize: 50000 }).then((matches) => {
-        setVisibleData(matches.slice(0, loadedRows))
-      })
-    }
-  }, [loadedRows, allData, debouncedQuery])
+    observer.observe(sentinel)
 
+    return () => {
+      if (sentinel) observer.unobserve(sentinel)
+    }
+  }, [loadedRows, visibleData.length])
+
+
+  // --- Helper Functions ---
   function toggleSort(key) {
     setSortState((prev) => {
       if (prev.key === key) {
         return { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
       }
-      return { key, dir: 'asc' }
+      return { key, dir: 'asc' } // Default to ascending when changing columns
     })
   }
 
@@ -114,6 +131,10 @@ export default function CustomersTable() {
     )
   }
 
+  // Determine the number of rows to actually render
+  const rowsToRender = sortedData.slice(0, loadedRows)
+  const dataCount = debouncedQuery ? visibleData.length : allData.length
+
   return (
     <div className="page">
       <header className="topbar">
@@ -125,7 +146,7 @@ export default function CustomersTable() {
 
       <div className="content">
         <div className="title-row">
-          <div className="title">All Customers <span className="badge">{allData.length.toLocaleString()}</span></div>
+          <div className="title">All Customers <span className="badge">{dataCount.toLocaleString()}</span></div>
         </div>
 
         <div className="controls">
@@ -161,7 +182,8 @@ export default function CustomersTable() {
               </tr>
             </thead>
             <tbody>
-              {sortedData.slice(0, loadedRows).map((c) => (
+              {/* Render only the currently loaded and sorted rows */}
+              {rowsToRender.map((c) => (
                 <tr key={c.id} className="row">
                   <td><input type="checkbox" /></td>
                   <td>
@@ -177,20 +199,21 @@ export default function CustomersTable() {
                   <td>{c.email}</td>
                   <td>{formatDateTime(c.lastMessageAt)}</td>
                   <td className="added-by">
-                  <img className="avatar" src="/public/addedBy.svg" alt="avatar" />
-                  {c.addedBy}
+                    <img className="avatar" src="/public/addedBy.svg" alt="avatar" />
+                    {c.addedBy}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div ref={sentinelRef} />
+          {/* Sentinel for Intersection Observer to trigger next load */}
+          {loadedRows < dataCount && (
+            <div ref={sentinelRef} className="loading-sentinel">
+              Loading more customers...
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-
-
-

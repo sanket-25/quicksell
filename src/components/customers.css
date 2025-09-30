@@ -25,12 +25,15 @@
     height: 20px;
 }
 
+/* Adjust content height calculation slightly for robustness */
 .content {
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    height: calc(100vh - 53px);
+    /* Using flex-grow instead of a hard calc height is often cleaner */
+    flex-grow: 1; 
+    min-height: 0; /* Important for flex children with overflow */
 }
 
 .title-row {
@@ -86,8 +89,14 @@
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
+    transition: background 0.1s;
 }
 
+.filter-btn:hover {
+    background: #f9fafb;
+}
+
+/* Make filter menu interaction more explicit */
 .filters:hover .filter-menu {
     display: block;
 }
@@ -95,18 +104,20 @@
 .filter-menu {
     display: none;
     position: absolute;
-    top: 40px;
-    left: 0;
+    /* Adjust top to sit nicely below button */
+    top: calc(100% + 4px); 
+    right: 0; /* Align right for better usability */
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     width: 180px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    z-index: 30; /* Ensure it appears over the table */
 }
 
 .filter-menu>div {
     padding: 10px 12px;
-    cursor: default;
+    cursor: pointer; /* Change to pointer to indicate it's clickable */
 }
 
 .filter-menu>div:hover {
@@ -115,7 +126,7 @@
 
 .table-container {
     flex: 1;
-    overflow: auto;
+    overflow-y: auto; /* Explicitly use y for vertical scroll */
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     background: #fff;
@@ -123,8 +134,9 @@
 
 .customers-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    /* Use collapse for a slightly cleaner look without visible separation */
+    border-collapse: collapse; 
+    /* Remove border-spacing as it's not needed with collapse */
 }
 
 .customers-table thead th {
@@ -158,10 +170,15 @@
     cursor: pointer;
     font: inherit;
     color: inherit;
+    /* Make button full width of the header for larger click area */
+    width: 100%; 
+    text-align: left;
+    padding: 0;
 }
 
 .th-btn .sort-caret {
     color: #9ca3af;
+    transition: color 0.1s;
 }
 
 .th-btn.active .sort-caret {
@@ -179,6 +196,7 @@
     height: 34px;
     border-radius: 50%;
     background: #e5e7eb;
+    object-fit: cover;
 }
 
 .customer-texts {
@@ -197,9 +215,22 @@
 
 .added-by {
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.user-icon {
-    color: #9ca3af;
-    margin-right: 6px;
+.added-by .avatar {
+    width: 24px;
+    height: 24px;
+}
+
+/* Added styles for the infinite scroll indicator */
+.loading-sentinel {
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    background: #fcfcfc;
+    border-top: 1px solid #e5e7eb;
 }
